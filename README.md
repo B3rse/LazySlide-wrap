@@ -12,7 +12,7 @@ docker pull b3rse/lazyslide:latest
 docker run --gpus all --rm \
     -v ~/.cache/huggingface:/models/huggingface \
     -v /path/to/data:/workspace \
-    b3rse/lazyslide:0a \
+    b3rse/lazyslide:latest \
     python /opt/extract_features.py \
         -i /workspace/slide.ndpi \
         -o /workspace/embeddings.h5ad \
@@ -29,7 +29,7 @@ apptainer pull lazyslide_latest.sif docker://b3rse/lazyslide:latest
 apptainer exec --nv \
     --bind ~/.cache/huggingface:/models/huggingface \
     --bind /path/to/data:/workspace \
-    lazyslide_0a.sif \
+    lazyslide_latest.sif \
     python /opt/extract_features.py \
         -i /workspace/slide.ndpi \
         -o /workspace/embeddings.h5ad \
