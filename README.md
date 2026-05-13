@@ -11,6 +11,7 @@ docker pull b3rse/lazyslide:latest
 
 docker run --gpus all --rm \
     --shm-size 8g \
+    --user $(id -u):$(id -g) \
     -v /path/to/hf/cache:/models/huggingface \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
@@ -39,12 +40,15 @@ apptainer exec --nv \
 
 > Use `--gpus all` / `--nv` only on GPU nodes. Omit these flags on CPU nodes.
 
+> **`--user` note:** when passing `--user $(id -u):$(id -g)` to Docker, ensure all mounted directories are owned and writable by your user: `sudo chown -R $(id -u):$(id -g) /path/to/hf/cache /path/to/data`.
+
 ### Interactive session
 
 **Docker:**
 ```bash
 docker run --gpus all -it --rm \
     --shm-size 8g \
+    --user $(id -u):$(id -g) \
     -v /path/to/hf/cache:/models/huggingface \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
@@ -87,7 +91,10 @@ print(adata)
 | CONCH | `conch` | [MahmoodLab/conch](https://huggingface.co/MahmoodLab/conch) | Request required |
 | PLIP | `plip` | [vinid/plip](https://huggingface.co/vinid/plip) | Open access |
 
-Gated models require a HuggingFace token passed via `--token` or stored at `/path/to/hf/cache/token` (set by `hf auth login`).
+Gated models require a HuggingFace token. Two ways to provide it:
+
+- **Environment variable (recommended):** pass `-e HF_TOKEN=hf_xxxx` to `docker run`, or `export HF_TOKEN=hf_xxxx` before `apptainer exec`. This is the most reliable method as it works for all models including those loaded via `timm`.
+- **Token file:** mount a directory containing a `token` file (created by `hf auth login`) to `/models/huggingface`. Pass `--token hf_xxxx` to the script as a fallback for models that read it directly from LazySlide.
 
 ## Output formats
 
