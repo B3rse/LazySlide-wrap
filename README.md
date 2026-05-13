@@ -37,7 +37,7 @@ apptainer exec --nv \
         -m gigapath --mpp 0.5 --tile-px 256 --amp
 ```
 
-> Use `--gpus all` / `--nv` only on GPU nodes. Omit it on CPU nodes — `cucim` falls back to CPU automatically.
+> Use `--gpus all` / `--nv` only on GPU nodes. Omit these flags on CPU nodes.
 
 ### Interactive session
 
