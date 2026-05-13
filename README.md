@@ -10,6 +10,7 @@ Docker/Apptainer image for whole slide image feature extraction using [LazySlide
 docker pull b3rse/lazyslide:latest
 
 docker run --gpus all --rm \
+    --shm-size 8g \
     -v ~/.cache/huggingface:/models/huggingface \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
