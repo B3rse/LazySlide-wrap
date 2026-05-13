@@ -16,6 +16,7 @@ import argparse
 from pathlib import Path
 
 import numpy as np
+import scipy.sparse as sp
 import lazyslide as zs
 from wsidata import open_wsi
 
@@ -35,7 +36,14 @@ def save_embeddings(adata, output_path: Path, model: str, verbose: bool = False)
             f"Supported: {', '.join(sorted(SUPPORTED_FORMATS))}"
         )
 
-    X = np.asarray(adata.X, dtype=np.float32)
+    X = adata.X
+
+    if sp.issparse(X):
+        X = X.toarray()
+    elif not isinstance(X, np.ndarray):
+        X = np.asarray(X)
+
+    X = X.astype(np.float32, copy=False)
 
     if verbose:
         print(f"Saving embeddings ({adata.shape[0]} tiles, {adata.shape[1]} dims) to {output_path}")
@@ -70,7 +78,7 @@ def save_embeddings(adata, output_path: Path, model: str, verbose: bool = False)
 
         torch.save({
             "embeddings": torch.tensor(X),
-            "obs": adata.obs.to_dict(),
+            "obs": adata.obs.to_dict(orient="list"),
             "model": model,
         }, output_path)
 
@@ -79,7 +87,7 @@ def save_embeddings(adata, output_path: Path, model: str, verbose: bool = False)
         np.savez_compressed(
             output_path,
             embeddings=X,
-            model=np.array(model),
+            model=model,
         )
 
     if verbose:
@@ -115,7 +123,7 @@ def parse_args(argv=None):
     model_source = model_group.add_mutually_exclusive_group()
     model_source.add_argument(
         "-m", "--model",
-        default="gigapath",
+        default=None,
         metavar="NAME",
         help="LazySlide model name. Run `python -c 'import lazyslide as zs; print(zs.models.list_models())'` for all options.",
     )
@@ -162,6 +170,7 @@ def parse_args(argv=None):
         metavar="STR",
         help="HuggingFace token for gated models. Falls back to HF_HOME/token if not set.",
     )
+
     # Tiling
     tiling = parser.add_argument_group("Tiling")
     tiling.add_argument(
@@ -238,12 +247,14 @@ def main(argv=None):
         )
         return 1
 
-    # When loading from a local path, model-name is required to identify the output table key
+    if not args.model and not args.model_path:
+        print("ERROR: Either --model or --model-path must be specified", file=sys.stderr)
+        return 1
+
     if args.model_path and not args.model_name:
         print("ERROR: --model-name is required when using --model-path", file=sys.stderr)
         return 1
 
-    # The key used to store and retrieve features in wsi.tables
     model_key = args.model_name or args.model
 
     # Open slide
@@ -299,14 +310,19 @@ def main(argv=None):
         device=args.device,
         amp=args.amp,
         token=args.token,
-        key_added=model_key,
     )
     elapsed = time.time() - t0
     print(f"Extraction complete in {elapsed/60:.1f} min ({elapsed:.1f} sec)")
 
-    # Retrieve embeddings
-    table_key = f"{model_key}_tiles"
-    adata = wsi.tables[table_key]
+    if model_key not in wsi.tables:
+        print(
+            f"ERROR: Feature table '{model_key}' not found. "
+            f"Available tables: {list(wsi.tables.keys())}",
+            file=sys.stderr,
+        )
+        return 1
+
+    adata = wsi.tables[model_key]
     if args.verbose:
         print(f"Embeddings shape: {adata.shape}")
 

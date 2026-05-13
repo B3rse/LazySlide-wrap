@@ -55,7 +55,7 @@ Gated models require a HuggingFace token passed via `--token` or stored at `~/.c
 
 | Flag | Format | Notes |
 |---|---|---|
-| `-o out.h5ad` | AnnData | Default — embeddings + metadata + coords |
+| `-o out.h5ad` | AnnData | Embeddings + metadata + spatial coordinates |
 | `-o out.h5` | HDF5 | CLAM-compatible |
 | `-o out.pt` | PyTorch | For training pipelines |
 | `-o out.npz` | NumPy | Maximally portable |
