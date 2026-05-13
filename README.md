@@ -49,6 +49,7 @@ apptainer exec --nv \
 docker run --gpus all -it --rm \
     --shm-size 8g \
     --user $(id -u):$(id -g) \
+    -e HOME=/workspace \
     -v /path/to/hf/cache:/models/huggingface \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
@@ -95,6 +96,7 @@ Gated models require a HuggingFace token. Two ways to provide it:
 
 - **Environment variable (recommended):** pass `-e HF_TOKEN=hf_xxxx` to `docker run`, or `export HF_TOKEN=hf_xxxx` before `apptainer exec`. This is the most reliable method as it works for all models including those loaded via `timm`.
 - **Token file:** mount a directory containing a `token` file (created by `hf auth login`) to `/models/huggingface`. Pass `--token hf_xxxx` to the script as a fallback for models that read it directly from LazySlide.
+- **Offline mode:** if weights are already cached, set `-e HF_HUB_OFFLINE=1` (Docker) or `export HF_HUB_OFFLINE=1` (Apptainer) to skip all network requests and use the local cache directly. Useful on compute nodes without internet access.
 
 ## Output formats
 
