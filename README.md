@@ -41,7 +41,15 @@ apptainer exec --nv \
 
 ## Models
 
-Gated models require [HuggingFace access approval](https://huggingface.co/) and a token passed via `--token` or stored at `~/.cache/huggingface/token`.
+| Model | `--model` | HuggingFace | Access |
+|---|---|---|---|
+| UNI2 | `uni2` | [MahmoodLab/UNI2-h](https://huggingface.co/MahmoodLab/UNI2-h) | Request required |
+| GigaPath | `gigapath` | [prov-gigapath/prov-gigapath](https://huggingface.co/prov-gigapath/prov-gigapath) | Request required |
+| Virchow2 | `virchow2` | [paige-ai/Virchow2](https://huggingface.co/paige-ai/Virchow2) | Request required |
+| CONCH | `conch` | [MahmoodLab/conch](https://huggingface.co/MahmoodLab/conch) | Request required |
+| PLIP | `plip` | [vinid/plip](https://huggingface.co/vinid/plip) | Open access |
+
+Gated models require a HuggingFace token passed via `--token` or stored at `~/.cache/huggingface/token` (set by `huggingface-cli login`).
 
 ## Output formats
 
