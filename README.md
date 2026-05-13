@@ -11,7 +11,7 @@ docker pull b3rse/lazyslide:latest
 
 docker run --gpus all --rm \
     --shm-size 8g \
-    -v ~/.cache/huggingface:/models/huggingface \
+    -v /path/to/hf/cache:/models/huggingface \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
     python /opt/extract_features.py \
@@ -28,7 +28,7 @@ apptainer pull lazyslide_latest.sif docker://b3rse/lazyslide:latest
 
 # Run
 apptainer exec --nv \
-    --bind ~/.cache/huggingface:/models/huggingface \
+    --bind /path/to/hf/cache:/models/huggingface \
     --bind /path/to/data:/workspace \
     lazyslide_latest.sif \
     python /opt/extract_features.py \
@@ -45,7 +45,7 @@ apptainer exec --nv \
 ```bash
 docker run --gpus all -it --rm \
     --shm-size 8g \
-    -v ~/.cache/huggingface:/models/huggingface \
+    -v /path/to/hf/cache:/models/huggingface \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
     ipython
@@ -54,7 +54,7 @@ docker run --gpus all -it --rm \
 **Apptainer:**
 ```bash
 apptainer exec --nv \
-    --bind ~/.cache/huggingface:/models/huggingface \
+    --bind /path/to/hf/cache:/models/huggingface \
     --bind /path/to/data:/workspace \
     lazyslide_latest.sif \
     ipython
@@ -87,7 +87,7 @@ print(adata)
 | CONCH | `conch` | [MahmoodLab/conch](https://huggingface.co/MahmoodLab/conch) | Request required |
 | PLIP | `plip` | [vinid/plip](https://huggingface.co/vinid/plip) | Open access |
 
-Gated models require a HuggingFace token passed via `--token` or stored at `~/.cache/huggingface/token` (set by `hf auth login`).
+Gated models require a HuggingFace token passed via `--token` or stored at `/path/to/hf/cache/token` (set by `hf auth login`).
 
 ## Output formats
 
