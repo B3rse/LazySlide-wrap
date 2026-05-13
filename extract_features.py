@@ -255,7 +255,8 @@ def main(argv=None):
         print("ERROR: --model-name is required when using --model-path", file=sys.stderr)
         return 1
 
-    model_key = args.model_name or args.model
+    model_name = args.model_name or args.model
+    model_key = f"{model_name}_tiles"
 
     # Open slide
     if args.verbose:
@@ -298,7 +299,7 @@ def main(argv=None):
 
     # Feature extraction
     if args.verbose:
-        print(f"Extracting features with model '{model_key}'...")
+        print(f"Extracting features with model '{model_name}'...")
     t0 = time.time()
     zs.tl.feature_extraction(
         wsi,
@@ -332,7 +333,7 @@ def main(argv=None):
 
     # Save
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    save_embeddings(adata, output_path, model=model_key, verbose=args.verbose)
+    save_embeddings(adata, output_path, model=model_name, verbose=args.verbose)
 
     return 0
 

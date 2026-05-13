@@ -49,7 +49,7 @@ apptainer exec --nv \
 | CONCH | `conch` | [MahmoodLab/conch](https://huggingface.co/MahmoodLab/conch) | Request required |
 | PLIP | `plip` | [vinid/plip](https://huggingface.co/vinid/plip) | Open access |
 
-Gated models require a HuggingFace token passed via `--token` or stored at `~/.cache/huggingface/token` (set by `huggingface-cli login`).
+Gated models require a HuggingFace token passed via `--token` or stored at `~/.cache/huggingface/token` (set by `hf auth login`).
 
 ## Output formats
 
