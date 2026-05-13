@@ -162,19 +162,6 @@ def parse_args(argv=None):
         metavar="STR",
         help="HuggingFace token for gated models. Falls back to HF_HOME/token if not set.",
     )
-    model_group.add_argument(
-        "--dense",
-        action="store_true",
-        help="Extract dense patch-level features for ViT models instead of a single CLS token per tile.",
-    )
-    model_group.add_argument(
-        "--pool-mode",
-        choices=["cls", "cls_patch_mean"],
-        default=None,
-        metavar="MODE",
-        help="Pooling mode for dense features (only used with --dense). Choices: cls, cls_patch_mean.",
-    )
-
     # Tiling
     tiling = parser.add_argument_group("Tiling")
     tiling.add_argument(
@@ -312,8 +299,6 @@ def main(argv=None):
         device=args.device,
         amp=args.amp,
         token=args.token,
-        dense=args.dense,
-        pool_mode=args.pool_mode,
         key_added=model_key,
     )
     elapsed = time.time() - t0
