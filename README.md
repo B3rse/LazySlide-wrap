@@ -39,6 +39,44 @@ apptainer exec --nv \
 
 > Use `--gpus all` / `--nv` only on GPU nodes. Omit it on CPU nodes — `cucim` falls back to CPU automatically.
 
+### Interactive session
+
+**Docker:**
+```bash
+docker run --gpus all -it --rm \
+    --shm-size 8g \
+    -v ~/.cache/huggingface:/models/huggingface \
+    -v /path/to/data:/workspace \
+    b3rse/lazyslide:latest \
+    ipython
+```
+
+**Apptainer:**
+```bash
+apptainer exec --nv \
+    --bind ~/.cache/huggingface:/models/huggingface \
+    --bind /path/to/data:/workspace \
+    lazyslide_latest.sif \
+    ipython
+```
+
+```python
+import lazyslide as zs
+from wsidata import open_wsi
+
+wsi = open_wsi("/workspace/slide.ndpi")
+zs.pp.find_tissues(wsi)
+zs.pp.tile_tissues(wsi, tile_px=256, mpp=0.5)
+
+# Limit tiles for quick testing
+wsi.shapes["tiles"] = wsi.shapes["tiles"].iloc[:5]
+
+zs.tl.feature_extraction(wsi, model="gigapath", amp=True)
+
+adata = wsi.tables["gigapath_tiles"]
+print(adata)
+```
+
 ## Models
 
 | Model | `--model` | HuggingFace | Access |
@@ -56,6 +94,7 @@ Gated models require a HuggingFace token passed via `--token` or stored at `~/.c
 | Flag | Format | Notes |
 |---|---|---|
 | `-o out.h5ad` | AnnData | Embeddings + metadata + spatial coordinates |
-| `-o out.h5` | HDF5 | CLAM-compatible |
 | `-o out.pt` | PyTorch | For training pipelines |
 | `-o out.npz` | NumPy | Maximally portable |
+
+> **`.pt` note:** the file contains non-tensor objects (`obs`, `model`), so load with `torch.load("embeddings.pt", weights_only=False)`.

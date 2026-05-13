@@ -5,7 +5,7 @@ Run LazySlide feature extraction on a whole slide image and save embeddings.
 
 Usage:
     python extract_features.py -i slide.ndpi -o embeddings.h5ad -m gigapath
-    python extract_features.py -i slide.ndpi -o embeddings.h5 -m uni2 --mpp 0.5 --tile-px 256
+    python extract_features.py -i slide.ndpi -o embeddings.npz -m uni2 --mpp 0.5 --tile-px 256
     python extract_features.py -i slide.ndpi -o embeddings.pt -m virchow2 --batch-size 64 --amp
     python extract_features.py -i slide.ndpi -o embeddings.h5ad --model-path /models/uni.pt --model-name uni
 """
@@ -23,7 +23,7 @@ from wsidata import open_wsi
 
 ## Output formats -------------------------------------------------------------------
 
-SUPPORTED_FORMATS = {".h5ad", ".h5", ".pt", ".npz"}
+SUPPORTED_FORMATS = {".h5ad", ".pt", ".npz"}
 
 
 def save_embeddings(adata, output_path: Path, model: str, verbose: bool = False):
@@ -52,25 +52,6 @@ def save_embeddings(adata, output_path: Path, model: str, verbose: bool = False)
         # AnnData format — best for scverse ecosystem (scanpy, squidpy)
         # preserves embeddings + tile metadata + spatial coordinates
         adata.write_h5ad(output_path)
-
-    elif ext == ".h5":
-        # CLAM-compatible HDF5 format — standard in computational pathology
-        # features dataset: (N, D) float32
-        # coords dataset:   (N, 2) int64  [x, y in slide pixel space]
-        import h5py
-
-        coords = np.stack([
-            adata.obs["x"].values,
-            adata.obs["y"].values,
-        ], axis=1).astype(np.int64) if all(c in adata.obs for c in ["x", "y"]) \
-        else np.zeros((adata.shape[0], 2), dtype=np.int64)
-
-        with h5py.File(output_path, "w") as f:
-            f.create_dataset("features", data=X)
-            f.create_dataset("coords", data=coords)
-            f.attrs["model"] = model
-            f.attrs["n_tiles"] = adata.shape[0]
-            f.attrs["embed_dim"] = adata.shape[1]
 
     elif ext == ".pt":
         # PyTorch tensor format — convenient for training pipelines
@@ -324,10 +305,6 @@ def main(argv=None):
         return 1
 
     adata = wsi.tables[model_key]
-
-    # TODO: disable after testing
-    print(list(adata.obs.columns))
-
     if args.verbose:
         print(f"Embeddings shape: {adata.shape}")
 
