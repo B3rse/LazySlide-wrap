@@ -323,6 +323,10 @@ def main(argv=None):
         return 1
 
     adata = wsi.tables[model_key]
+
+    # TODO: disable after testing
+    print(list(adata.obs.columns))
+
     if args.verbose:
         print(f"Embeddings shape: {adata.shape}")
 
