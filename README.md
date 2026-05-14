@@ -46,7 +46,7 @@ apptainer exec --nv \
 
 > **Singularity:** all `apptainer` commands work with `singularity` by swapping the command name — Apptainer is the renamed successor to Singularity.
 
-> **Model cache mounts:** always mount all three cache directories to writable host paths. HuggingFace models cache to `/models/huggingface`; torchvision models (e.g. used by `virtual_stain`) cache to `/models/torch`; general XDG cache (matplotlib, etc.) goes to `/models/.cache`. Without these mounts the directories are read-only inside the container and writes will fail when running as `--user`.
+> **Model cache mounts:** always mount all three cache directories to writable host paths. HuggingFace models cache to `/models/huggingface`; Torch model weights cache to `/models/torch`; general XDG cache (matplotlib, etc.) goes to `/models/.cache`. Without these mounts, model and runtime caches are stored inside the container filesystem and may become unwritable or non-persistent when running with `--user`.
 
 > **Separate output directory:** input data and output embeddings can be mounted independently — add `-v /path/to/output:/output` and write to `-o /output/embeddings.h5ad`.
 
