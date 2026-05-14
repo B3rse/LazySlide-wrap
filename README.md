@@ -40,7 +40,9 @@ apptainer exec --nv \
 
 > Use `--gpus all` / `--nv` only on GPU nodes. Omit these flags on CPU nodes.
 
-> **`--user` note:** when passing `--user $(id -u):$(id -g)` to Docker, ensure all mounted directories are owned and writable by your user: `sudo chown -R $(id -u):$(id -g) /path/to/hf/cache /path/to/data`.
+> **Separate output directory:** input data and output embeddings can be mounted independently — add `-v /path/to/output:/output` and write to `-o /output/embeddings.h5ad`.
+
+> **`--user` note:** when passing `--user $(id -u):$(id -g)` to Docker, ensure all mounted directories exist and are owned and writable by your user: `mkdir -p /path/to/output && sudo chown -R $(id -u):$(id -g) /path/to/hf/cache /path/to/data /path/to/output`.
 
 ### Interactive session
 
