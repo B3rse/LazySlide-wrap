@@ -40,6 +40,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --no-cache-dir --upgrade \
     pip setuptools wheel
 
+# Pin transformers — TITAN remote code predates all_tied_weights_keys (added post 4.49)
+RUN pip install --no-cache-dir "transformers==4.49.0"
+
 # CUDA torch — must precede lazyslide to avoid pulling CPU variant
 RUN pip install --no-cache-dir \
     torch torchvision --index-url https://download.pytorch.org/whl/cu124
