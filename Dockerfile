@@ -84,12 +84,26 @@ RUN pip install --no-cache-dir --no-deps \
 RUN pip install --no-cache-dir --no-deps \
     git+https://github.com/lilab-stanford/MUSK.git
 
+# GigaPath slide encoder dependencies
+# ninja speeds up CUDA extension compilation
+# omegaconf, fvcore, iopath, einops required by prov-gigapath
+RUN pip install --no-cache-dir \
+    ninja \
+    omegaconf \
+    fvcore \
+    iopath \
+    einops
+
 # GigaPath slide encoder (required for feature_aggregation with gigapath-slide-encoder)
 RUN pip install --no-cache-dir \
     git+https://github.com/prov-gigapath/prov-gigapath
 
 # FlashAttention — required by GigaPath slide encoder (LongNet attention)
-RUN pip install --no-cache-dir flash-attn --no-build-isolation
+# Pinned to 2.5.8 as specified in official prov-gigapath environment
+# Force old C++ ABI to match PyTorch wheels from PyPI (compiled with cxx11abi=FALSE)
+RUN FLASH_ATTENTION_FORCE_BUILD=TRUE \
+    CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" \
+    pip install --no-cache-dir "flash-attn==2.5.8" --no-build-isolation
 
 # Visualization / notebook / IO extras
 RUN pip install --no-cache-dir \
