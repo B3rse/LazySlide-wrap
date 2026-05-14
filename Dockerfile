@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
 # Runtime/cache configuration
 # HF_HUB_OFFLINE=1 can optionally be set at runtime for no internet access / local-only models
@@ -83,6 +83,13 @@ RUN pip install --no-cache-dir --no-deps \
     git+https://github.com/mahmoodlab/CONCH.git
 RUN pip install --no-cache-dir --no-deps \
     git+https://github.com/lilab-stanford/MUSK.git
+
+# GigaPath slide encoder (required for feature_aggregation with gigapath-slide-encoder)
+RUN pip install --no-cache-dir \
+    git+https://github.com/prov-gigapath/prov-gigapath
+
+# FlashAttention — required by GigaPath slide encoder (LongNet attention)
+RUN pip install --no-cache-dir flash-attn --no-build-isolation
 
 # Visualization / notebook / IO extras
 RUN pip install --no-cache-dir \
