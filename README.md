@@ -40,6 +40,8 @@ apptainer exec --nv \
 
 > Use `--gpus all` / `--nv` only on GPU nodes. Omit these flags on CPU nodes.
 
+> **Singularity:** all `apptainer` commands work with `singularity` by swapping the command name — Apptainer is the renamed successor to Singularity.
+
 > **Separate output directory:** input data and output embeddings can be mounted independently — add `-v /path/to/output:/output` and write to `-o /output/embeddings.h5ad`.
 
 > **`--user` note:** when passing `--user $(id -u):$(id -g)` to Docker, ensure all mounted directories exist and are owned and writable by your user: `mkdir -p /path/to/output && sudo chown -R $(id -u):$(id -g) /path/to/hf/cache /path/to/data /path/to/output`.
@@ -48,7 +50,7 @@ apptainer exec --nv \
 
 **On the server** (use tmux to keep it running after disconnecting):
 ```bash
-docker run -it --rm \
+docker run --gpus all -it --rm \
     --shm-size 8g \
     --user $(id -u):$(id -g) \
     -e HOME=/workspace \
@@ -58,6 +60,17 @@ docker run -it --rm \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
     jupyter lab --ip=0.0.0.0 --no-browser
+```
+
+**Apptainer** (use tmux to keep it running after disconnecting):
+```bash
+export HF_TOKEN=hf_xxxxxxxxxxxx
+
+apptainer exec --nv \
+    --bind /path/to/hf/cache:/models/huggingface \
+    --bind /path/to/data:/workspace \
+    lazyslide_latest.sif \
+    jupyter lab --ip=0.0.0.0 --no-browser --port=8888
 ```
 
 **On your laptop**, open a new terminal and create an SSH tunnel:
