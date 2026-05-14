@@ -44,6 +44,46 @@ apptainer exec --nv \
 
 > **`--user` note:** when passing `--user $(id -u):$(id -g)` to Docker, ensure all mounted directories exist and are owned and writable by your user: `mkdir -p /path/to/output && sudo chown -R $(id -u):$(id -g) /path/to/hf/cache /path/to/data /path/to/output`.
 
+### JupyterLab
+
+**On the server** (use tmux to keep it running after disconnecting):
+```bash
+docker run -it --rm \
+    --shm-size 8g \
+    --user $(id -u):$(id -g) \
+    -e HOME=/workspace \
+    -e HF_TOKEN=hf_xxxxxxxxxxxx \
+    -p 8888:8888 \
+    -v /path/to/hf/cache:/models/huggingface \
+    -v /path/to/data:/workspace \
+    b3rse/lazyslide:latest \
+    jupyter lab --ip=0.0.0.0 --no-browser
+```
+
+**On your laptop**, open a new terminal and create an SSH tunnel:
+```bash
+ssh -L 8888:localhost:8888 user@server
+```
+
+Then open the URL printed in the server output in your browser:
+```
+http://127.0.0.1:8888/lab?token=<token>
+```
+
+All code runs inside the container on the server. Files saved to `/workspace` persist on the host at `/path/to/data`.
+
+To close the tunnel just close the terminal — JupyterLab keeps running on the server. Reconnect anytime with the same `ssh -L` command and token URL.
+
+Multiple users can run simultaneously by mapping different host ports. Each user picks a unique port (e.g. 8888, 8889, 8890) on both the server `-p` flag and the SSH tunnel:
+```bash
+# server (each user uses a different host port)
+docker run ... -p 8889:8888 ...
+# laptop
+ssh -L 8889:localhost:8889 user@server
+# browser
+http://127.0.0.1:8889/lab?token=<token>
+```
+
 ### Interactive session
 
 **Docker:**
