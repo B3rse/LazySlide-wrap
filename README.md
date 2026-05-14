@@ -13,6 +13,8 @@ docker run --gpus all --rm \
     --shm-size 8g \
     --user $(id -u):$(id -g) \
     -v /path/to/hf/cache:/models/huggingface \
+    -v /path/to/torch/cache:/models/torch \
+    -v /path/to/xdg/cache:/models/.cache \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
     python /opt/extract_features.py \
@@ -30,6 +32,8 @@ apptainer pull lazyslide_latest.sif docker://b3rse/lazyslide:latest
 # Run
 apptainer exec --nv \
     --bind /path/to/hf/cache:/models/huggingface \
+    --bind /path/to/torch/cache:/models/torch \
+    --bind /path/to/xdg/cache:/models/.cache \
     --bind /path/to/data:/workspace \
     lazyslide_latest.sif \
     python /opt/extract_features.py \
@@ -42,9 +46,11 @@ apptainer exec --nv \
 
 > **Singularity:** all `apptainer` commands work with `singularity` by swapping the command name — Apptainer is the renamed successor to Singularity.
 
+> **Model cache mounts:** always mount all three cache directories to writable host paths. HuggingFace models cache to `/models/huggingface`; torchvision models (e.g. used by `virtual_stain`) cache to `/models/torch`; general XDG cache (matplotlib, etc.) goes to `/models/.cache`. Without these mounts the directories are read-only inside the container and writes will fail when running as `--user`.
+
 > **Separate output directory:** input data and output embeddings can be mounted independently — add `-v /path/to/output:/output` and write to `-o /output/embeddings.h5ad`.
 
-> **`--user` note:** when passing `--user $(id -u):$(id -g)` to Docker, ensure all mounted directories exist and are owned and writable by your user: `mkdir -p /path/to/output && sudo chown -R $(id -u):$(id -g) /path/to/hf/cache /path/to/data /path/to/output`.
+> **`--user` note:** when passing `--user $(id -u):$(id -g)` to Docker, ensure all mounted directories exist and are owned and writable by your user: `mkdir -p /path/to/hf/cache /path/to/torch/cache /path/to/xdg/cache /path/to/output && sudo chown -R $(id -u):$(id -g) /path/to/hf/cache /path/to/torch/cache /path/to/xdg/cache /path/to/data /path/to/output`.
 
 ### JupyterLab
 
@@ -57,6 +63,8 @@ docker run --gpus all -it --rm \
     -e HF_TOKEN=hf_xxxxxxxxxxxx \
     -p 8888:8888 \
     -v /path/to/hf/cache:/models/huggingface \
+    -v /path/to/torch/cache:/models/torch \
+    -v /path/to/xdg/cache:/models/.cache \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
     jupyter lab --ip=0.0.0.0 --no-browser
@@ -68,6 +76,8 @@ export HF_TOKEN=hf_xxxxxxxxxxxx
 
 apptainer exec --nv \
     --bind /path/to/hf/cache:/models/huggingface \
+    --bind /path/to/torch/cache:/models/torch \
+    --bind /path/to/xdg/cache:/models/.cache \
     --bind /path/to/data:/workspace \
     lazyslide_latest.sif \
     jupyter lab --ip=0.0.0.0 --no-browser --port=8888
@@ -106,6 +116,8 @@ docker run --gpus all -it --rm \
     --user $(id -u):$(id -g) \
     -e HOME=/workspace \
     -v /path/to/hf/cache:/models/huggingface \
+    -v /path/to/torch/cache:/models/torch \
+    -v /path/to/xdg/cache:/models/.cache \
     -v /path/to/data:/workspace \
     b3rse/lazyslide:latest \
     ipython
@@ -115,6 +127,8 @@ docker run --gpus all -it --rm \
 ```bash
 apptainer exec --nv \
     --bind /path/to/hf/cache:/models/huggingface \
+    --bind /path/to/torch/cache:/models/torch \
+    --bind /path/to/xdg/cache:/models/.cache \
     --bind /path/to/data:/workspace \
     lazyslide_latest.sif \
     ipython
