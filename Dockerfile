@@ -38,9 +38,16 @@ RUN pip install --no-cache-dir --upgrade \
 RUN pip install --no-cache-dir \
     torch torchvision --index-url https://download.pytorch.org/whl/cu124
 
-# Core lazyslide with all pip-available extras
-RUN pip install --no-cache-dir \
-    "lazyslide[all,models]"
+# Core lazyslide — pip (stable) or source (latest main)
+# Build with: docker build --build-arg LAZYSLIDE_SOURCE=source .
+ARG LAZYSLIDE_SOURCE=pip
+RUN if [ "$LAZYSLIDE_SOURCE" = "source" ]; then \
+        pip install --no-cache-dir \
+        "lazyslide[all,models] @ git+https://github.com/rendeirolab/LazySlide.git"; \
+    else \
+        pip install --no-cache-dir \
+        "lazyslide[all,models]"; \
+    fi
 
 # Segmentation / augmentation / generation ecosystem
 RUN pip install --no-cache-dir \
