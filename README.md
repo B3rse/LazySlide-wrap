@@ -85,8 +85,14 @@ apptainer exec --nv \
 
 **On your laptop**, open a new terminal and create an SSH tunnel:
 ```bash
-ssh -L 8888:localhost:8888 user@server
+# JupyterLab running on the login node
+ssh -L 8888:localhost:8888 user@login-node
+
+# JupyterLab running on an internal compute/GPU node
+ssh -L 8888:gpu-node:8888 user@login-node
 ```
+
+Use the second form when JupyterLab is running on an internal node you reach via `ssh gpu-node` from the login node. Replace `gpu-node` with the actual hostname.
 
 Then open the URL printed in the server output in your browser:
 ```
