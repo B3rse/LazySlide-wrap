@@ -165,7 +165,7 @@ print(adata)
 | GigaPath | `gigapath` | [prov-gigapath/prov-gigapath](https://huggingface.co/prov-gigapath/prov-gigapath) | Request required |
 | Virchow2 | `virchow2` | [paige-ai/Virchow2](https://huggingface.co/paige-ai/Virchow2) | Request required |
 | CONCH | `conch` | [MahmoodLab/conch](https://huggingface.co/MahmoodLab/conch) | Request required |
-| PLIP | `plip` | [vinid/plip](https://huggingface.co/vinid/plip) | Open access |
+| TITAN | `titan` | [MahmoodLab/TITAN](https://huggingface.co/MahmoodLab/TITAN) | Request required |
 
 Gated models require a HuggingFace token. Two ways to provide it:
 
